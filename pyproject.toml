@@ -1,0 +1,111 @@
+[project]
+name = "laima"
+version = "0.0.0"
+description = "A powerful dependency injection framework that automatically managing objects lifespan, promoting loose coupling, improving testability, and centralizing configuration for easier maintenance."
+readme = "README.md"
+license = { file = "LICENSE" }
+keywords = ["Dependency Injection"]
+authors = [
+    { name = "Mateusz Baran" }
+]
+maintainers = [
+    { name = "Mateusz Baran" }
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+]
+requires-python = ">=3.10"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "ruff==0.11.4",
+    "mypy==1.15.0",
+    "pytest-asyncio==0.25.3",
+    "pytest==8.3.4",
+]
+release = [
+    "bump-my-version==1.1.1",
+]
+deploy = [
+    "build==1.2.2",
+]
+
+[project.urls]
+repository = "https://github.com/mateuszbaransanok/laima"
+
+[tool.pytest.ini_options]
+norecursedirs = ".git .tox .mypy_cache .pytest_cache .ruff_cache .venv .vscode .idea __pycache__"
+log_cli = true
+log_cli_level = "WARNING"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+
+[tool.mypy]
+disallow_untyped_defs = true
+ignore_missing_imports = true
+show_error_codes = true
+
+[tool.ruff]
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".tox",
+    ".venv",
+    ".vscode",
+    ".idea",
+    "__pycache__",
+]
+
+line-length = 120
+indent-width = 4
+
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "ANN401", # Dynamically typed expressions (typing.Any) are disallowed in ...
+    "BLE001", # Do not catch blind exception: `Exception`
+    "C901", # ... is too complex
+    "D100", # Missing docstring in public module
+    "D101", # Missing docstring in public class
+    "D102", # Missing docstring in public method
+    "D103", # Missing docstring in public function
+    "D104", # Missing docstring in public package
+    "D105", # Missing docstring in magic method
+    "D107", # Missing docstring in `__init__`
+    "D203", # Incorrect blank line before class
+    "D213", # Multi line summary second line
+    "EM101", # Exception must not use a string literal, assign to variable first
+    "FIX002", # Line contains TO DO, consider resolving the issue
+    "INP001", # File ... is part of an implicit namespace package. Add an `__init__.py`
+    "PLR0915", # Too many statements
+    "S101", # Use of `assert` detected,
+    "TD002", #  Missing author in TO DO
+    "TRY003", # Avoid specifying long messages outside the exception class
+]
+fixable = ["ALL"]
+unfixable = []
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+docstring-code-format = false
+docstring-code-line-length = "dynamic"
