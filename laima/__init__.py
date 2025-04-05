@@ -3,7 +3,7 @@ from laima.core.functions import get_lifespan, get_tags, reset_singleton
 from laima.core.lifespans import scoped, singleton, transient
 from laima.core.register import discover, registered
 
-__version__ = "0.0.0"
+__version__ = "0.1.0"
 
 __all__ = [
     "__version__",

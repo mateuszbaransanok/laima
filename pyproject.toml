@@ -1,6 +1,6 @@
 [project]
 name = "laima"
-version = "0.0.0"
+version = "0.1.0"
 description = "A powerful dependency injection framework that automatically managing objects lifespan, promoting loose coupling, improving testability, and centralizing configuration for easier maintenance."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -44,7 +44,7 @@ deploy = [
 repository = "https://github.com/mateuszbaransanok/laima"
 
 [tool.bumpversion]
-current_version = "0.0.0"
+current_version = "0.1.0"
 commit = true
 message = "Release v{new_version}"
 
