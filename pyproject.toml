@@ -43,6 +43,21 @@ deploy = [
 [project.urls]
 repository = "https://github.com/mateuszbaransanok/laima"
 
+[tool.bumpversion]
+current_version = "0.0.0"
+commit = true
+message = "Release v{new_version}"
+
+[[tool.bumpversion.files]]
+filename = "laima/__init__.py"
+search = "__version__ = \"{current_version}\""
+replace = "__version__ = \"{new_version}\""
+
+[[tool.bumpversion.files]]
+filename = "uv.lock"
+search = "name = \"laima\"\nversion = \"{current_version}\""
+replace = "name = \"laima\"\nversion = \"{new_version}\""
+
 [tool.pytest.ini_options]
 norecursedirs = ".git .tox .mypy_cache .pytest_cache .ruff_cache .venv .vscode .idea __pycache__"
 log_cli = true
@@ -69,10 +84,8 @@ exclude = [
     ".idea",
     "__pycache__",
 ]
-
 line-length = 120
 indent-width = 4
-
 target-version = "py310"
 
 [tool.ruff.lint]
