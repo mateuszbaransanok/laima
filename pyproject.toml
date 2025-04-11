@@ -16,14 +16,13 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Operating System :: OS Independent",
     "License :: OSI Approved :: MIT License",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = []
 
 [dependency-groups]
@@ -86,12 +85,17 @@ exclude = [
 ]
 line-length = 120
 indent-width = 4
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
+    "A001", # Variable `callable` is shadowing a Python builtin
+    "A002", # Function argument `callable` is shadowing a Python builtin
     "ANN401", # Dynamically typed expressions (typing.Any) are disallowed in ...
+    "B007", # Loop control variable ... not used within loop body
+    "B028", # No explicit `stacklevel` keyword argument found
+    "B904", # Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
     "BLE001", # Do not catch blind exception: `Exception`
     "C901", # ... is too complex
     "D100", # Missing docstring in public module
@@ -104,10 +108,19 @@ ignore = [
     "D203", # Incorrect blank line before class
     "D213", # Multi line summary second line
     "EM101", # Exception must not use a string literal, assign to variable first
+    "EM102", # Exception must not use an f-string literal, assign to variable first
     "FIX002", # Line contains TO DO, consider resolving the issue
     "INP001", # File ... is part of an implicit namespace package. Add an `__init__.py`
+    "N818", # Exception name `DIErrorWrapper` should be named with an Error suffix
+    "PLR0911", # Too many return statements
+    "PLR0913", # Too many arguments in function definition
     "PLR0915", # Too many statements
+    "PLR2004", # Magic value used in comparison, consider replacing ... with a constant variable
+    "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
     "S101", # Use of `assert` detected,
+    "S311", # Standard pseudo-random generators are not suitable for cryptographic purposes
+    "T201", # `print` found
+    "TC001", # Move application import ... into a type-checking block
     "TD002", #  Missing author in TO DO
     "TRY003", # Avoid specifying long messages outside the exception class
 ]

@@ -1,7 +1,7 @@
 import asyncio
 import warnings
 from abc import ABC, abstractmethod
-from collections.abc import AsyncIterator, Iterator
+from collections.abc import AsyncIterator, Awaitable, Iterator
 from dataclasses import dataclass, field
 from typing import Generic, TypeVar
 
@@ -24,7 +24,7 @@ class Data(Generic[T], ABC):
 
 @dataclass
 class Object(Data[T]):
-    obj: AsyncIterator[T] | Iterator[T] | T
+    object: AsyncIterator[T] | Iterator[T] | Awaitable[T] | T
     instance: T | Empty = EMPTY
 
     @classmethod
@@ -38,22 +38,24 @@ class Object(Data[T]):
                 instance = obj
 
         return cls(
-            obj=obj,
+            object=obj,
             instance=instance,
         )
 
     @classmethod
-    async def acreate(cls, obj: AsyncIterator[T] | Iterator[T] | T) -> "Object":
+    async def acreate(cls, obj: AsyncIterator[T] | Iterator[T] | Awaitable[T] | T) -> "Object":
         match obj:
             case AsyncIterator():
                 instance = await anext(obj)
             case Iterator():
                 instance = next(obj)
+            case Awaitable():
+                instance = await obj
             case _:
                 instance = obj
 
         return cls(
-            obj=obj,
+            object=obj,
             instance=instance,
         )
 
@@ -63,12 +65,12 @@ class Object(Data[T]):
         return self.instance
 
     def close(self) -> None:
-        match self.obj:
+        match self.object:
             case AsyncIterator():
                 raise LaimaAsyncError("Object have to be closed asynchronously; use `aclose()`")
             case Iterator():
                 try:
-                    next(self.obj)
+                    next(self.object)
                 except StopIteration:
                     pass
                 except Exception as exc:
@@ -77,10 +79,10 @@ class Object(Data[T]):
                     self.instance = EMPTY
 
     async def aclose(self) -> None:
-        match self.obj:
+        match self.object:
             case AsyncIterator():
                 try:
-                    await anext(self.obj)
+                    await anext(self.object)
                 except StopAsyncIteration:
                     pass
                 except Exception as exc:
@@ -89,7 +91,7 @@ class Object(Data[T]):
                     self.instance = EMPTY
             case Iterator():
                 try:
-                    next(self.obj)
+                    next(self.object)
                 except StopIteration:
                     pass
                 except Exception as exc:
@@ -120,8 +122,8 @@ class ScopedData(Data[T]):
 
     def close(self) -> None:
         if self.obj is not None:
-            self.close()
+            self.obj.close()
 
     async def aclose(self) -> None:
         if self.obj is not None:
-            await self.aclose()
+            await self.obj.aclose()
