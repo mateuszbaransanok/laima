@@ -1,8 +1,8 @@
 import asyncio
 from typing import Any, TypeVar, overload
 
-from laima.core.providers.provider import Provider
-from laima.exceptions import LaimaError
+from laima.exc import LaimaError
+from laima.providers.provider import Provider
 from laima.utils.lock import Lock
 
 T = TypeVar("T")
@@ -16,11 +16,9 @@ class Container:
     def __str__(self) -> str:
         return f"{self.__class__.__qualname__}({self._registry})"
 
-    def registered(self) -> list[type | str]:
-        return list(self._registry.keys())
-
-    def providers(self) -> list[Provider]:
-        return list(self._registry.values())
+    @property
+    def registry(self) -> dict[type | str, Provider]:
+        return self._registry.copy()
 
     @overload
     def get(self, obj: type | str) -> Provider:

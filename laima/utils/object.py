@@ -5,7 +5,7 @@ from collections.abc import AsyncIterator, Awaitable, Iterator
 from dataclasses import dataclass, field
 from typing import Generic, TypeVar
 
-from laima.exceptions import LaimaAsyncError, LaimaError
+from laima.exc import LaimaAsyncError, LaimaError
 from laima.utils.empty import EMPTY, Empty
 from laima.utils.lock import Lock
 

@@ -6,9 +6,9 @@ from contextvars import ContextVar, Token
 from types import TracebackType
 from typing import Annotated, Any, ParamSpec, TypeVar, get_args, get_origin, overload
 
-from laima.core.container import Container
-from laima.core.providers.provider import Provider
-from laima.exceptions import LaimaError, LaimaTypeError
+from laima.container import LAIMA_MAIN_CONTAINER, Container
+from laima.exc import LaimaError, LaimaTypeError
+from laima.providers.provider import Provider
 from laima.utils.context import Context
 
 T = TypeVar("T")
@@ -17,7 +17,7 @@ P = ParamSpec("P")
 CONTEXT: ContextVar[Context | None] = ContextVar("CONTEXT", default=None)
 
 
-class Injector:
+class ContextManager:
     def __init__(self, container: Container, *, reuse_context: bool = True) -> None:
         self._container = container
         self._reuse_context = reuse_context
@@ -34,7 +34,8 @@ class Injector:
 
     def __call__(self, func: Any) -> Any:
         if getattr(func, "__laima_inject__", False):
-            raise LaimaError("Overlapped decorator `@laima.inject`")
+            return func
+
         if isinstance(func, Provider):
             raise LaimaError("Decorator `@laima.inject` cannot be used on Provider")
 
@@ -45,7 +46,6 @@ class Injector:
             **kwargs: Any,
         ) -> tuple[inspect.BoundArguments, dict[str, Provider]]:
             bound_params = signature.bind_partial(*args, **kwargs)
-
             providers = {}
             for param in signature.parameters.values():
                 if param.name in bound_params.arguments or param.default is not param.empty:
@@ -63,8 +63,7 @@ class Injector:
                             providers[param.name] = provider
 
                 if param.name not in providers:
-                    raise LaimaTypeError(
-                        f"{func.__qualname__} missing a required argument: '{param.name}'")
+                    raise LaimaTypeError(f"{func.__qualname__} missing a required argument: '{param.name}'")
 
             return bound_params, providers
 
@@ -72,7 +71,7 @@ class Injector:
         def sync_function(*args: Any, **kwargs: Any) -> Any:
             bound_params, providers = prepare_arguments(*args, **kwargs)
 
-            with Injector(container=self._container, reuse_context=self._reuse_context):
+            with ContextManager(container=self._container, reuse_context=self._reuse_context):
                 for name, provider in providers.items():
                     bound_params.arguments[name] = provider.provide()
 
@@ -83,7 +82,7 @@ class Injector:
         async def async_function(*args: Any, **kwargs: Any) -> Any:
             bound_params, providers = prepare_arguments(*args, **kwargs)
 
-            async with Injector(container=self._container, reuse_context=self._reuse_context):
+            async with ContextManager(container=self._container, reuse_context=self._reuse_context):
                 values = await asyncio.gather(*(provider.aprovide() for provider in providers.values()))
                 for name, value in zip(providers, values, strict=True):
                     bound_params.arguments[name] = value
@@ -95,7 +94,7 @@ class Injector:
         def sync_generator(*args: Any, **kwargs: Any) -> Any:
             bound_params, providers = prepare_arguments(*args, **kwargs)
 
-            with Injector(container=self._container, reuse_context=self._reuse_context):
+            with ContextManager(container=self._container, reuse_context=self._reuse_context):
                 for name, provider in providers.items():
                     bound_params.arguments[name] = provider.provide()
 
@@ -106,7 +105,7 @@ class Injector:
         async def async_generator(*args: Any, **kwargs: Any) -> Any:
             bound_params, providers = prepare_arguments(*args, **kwargs)
 
-            async with Injector(container=self._container, reuse_context=self._reuse_context):
+            async with ContextManager(container=self._container, reuse_context=self._reuse_context):
                 values = await asyncio.gather(*(provider.aprovide() for provider in providers.values()))
                 for name, value in zip(providers, values, strict=True):
                     bound_params.arguments[name] = value
@@ -161,3 +160,29 @@ class Injector:
             await self._ctx.aclose()
         if self._token:
             CONTEXT.reset(self._token)
+
+
+@overload
+def inject(func: Callable[P, T]) -> Callable[..., T]:
+    pass
+
+
+@overload
+def inject(*, container: Container | None = None, reuse_context: bool = True) -> ContextManager:
+    pass
+
+
+def inject(
+    func: Any = None,
+    *,
+    container: Container | None = None,
+    reuse_context: bool = True,
+) -> Any:
+    context_manager = ContextManager(
+        reuse_context=reuse_context,
+        container=container or LAIMA_MAIN_CONTAINER,
+    )
+
+    if func is None:
+        return context_manager
+    return context_manager(func)

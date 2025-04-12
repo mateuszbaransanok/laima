@@ -5,7 +5,7 @@ from collections.abc import Callable
 from functools import partial
 from typing import Any, Generic, Self, TypeVar
 
-from laima.exceptions import LaimaTypeError
+from laima.exc import LaimaTypeError
 from laima.utils.lock import Lock
 from laima.utils.status import Status
 
