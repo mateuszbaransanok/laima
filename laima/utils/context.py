@@ -1,7 +1,7 @@
 import asyncio
 from typing import Generic, TypeVar
 
-from laima.core.providers.provider import Provider
+from laima.providers.provider import Provider
 from laima.utils.lock import Lock
 from laima.utils.object import Data
 

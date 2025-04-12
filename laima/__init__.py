@@ -1,17 +1,9 @@
-from laima.core.container import (
-    Container,
-    areset_container,
-    bind,
-    get,
-    reset_container,
-    unbind,
-    unbind_all,
-)
-from laima.core.decorators import inject, scoped, singleton, transient
-from laima.core.providers.provider import Provider
-from laima.core.providers.scoped import Scoped
-from laima.core.providers.singleton import Singleton
-from laima.core.providers.transient import Transient
+from laima.container import Container, areset_container, bind, get, reset_container, unbind, unbind_all
+from laima.context import inject
+from laima.providers.provider import Provider
+from laima.providers.scoped import Scoped, scoped
+from laima.providers.singleton import Singleton, singleton
+from laima.providers.transient import Transient, transient
 from laima.utils.discover import discover
 
 __version__ = "0.1.0"
@@ -19,16 +11,15 @@ __version__ = "0.1.0"
 __all__ = [
     "Container",
     "Provider",
-    "Provider",
     "Scoped",
     "Singleton",
     "Transient",
     "__version__",
     "areset_container",
     "bind",
-    "core",
+    "context",
     "discover",
-    "exceptions",
+    "exc",
     "get",
     "inject",
     "reset_container",
